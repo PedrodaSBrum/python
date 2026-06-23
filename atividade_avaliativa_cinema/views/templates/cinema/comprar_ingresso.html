@@ -1,0 +1,37 @@
+{% extends "layout.html" %}
+{% block title %}Comprar Ingresso{% endblock %}
+
+{% block content %}
+<h1>🎟️ Comprar Ingresso</h1>
+
+<div class="card" style="max-width:500px; margin-bottom:1.5rem;">
+    <p><strong>Filme:</strong> {{ sessao.filme.titulo }}</p>
+    <p style="margin-top:0.4rem;"><strong>Sala:</strong> {{ sessao.sala.numero }} ({{ sessao.sala.capacidade }} lugares)</p>
+    <p style="margin-top:0.4rem;"><strong>Data/Hora:</strong> {{ sessao.data_hora.strftime('%d/%m/%Y às %H:%M') }}</p>
+    <p style="margin-top:0.4rem;"><strong>Preço:</strong> R$ {{ "%.2f"|format(sessao.preco) }}</p>
+    <p style="margin-top:0.4rem;"><strong>Vagas disponíveis:</strong> {{ sessao.vagas_disponiveis() }}</p>
+
+    {% if sessao.assentos_ocupados() %}
+    <p style="margin-top:0.6rem; font-size:0.85rem; color:#888;">
+        Ocupados: {{ sessao.assentos_ocupados() | join(', ') }}
+    </p>
+    {% endif %}
+</div>
+
+<div class="card" style="max-width:500px;">
+    <form method="POST">
+        <div class="form-grupo">
+            <label>Seu nome</label>
+            <input type="text" name="nome_comprador" placeholder="Ex: Maria Silva" required>
+        </div>
+        <div class="form-grupo">
+            <label>Assento (ex: A1, B12)</label>
+            <input type="text" name="assento" placeholder="Ex: C5" maxlength="10" required>
+        </div>
+        <div style="display:flex; gap:0.8rem; margin-top:1.5rem;">
+            <button type="submit" class="btn">Confirmar compra</button>
+            <a href="{{ url_for('cinema.index') }}" class="btn btn-ghost">← Voltar</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

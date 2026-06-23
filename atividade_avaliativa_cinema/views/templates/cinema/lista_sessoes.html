@@ -1,0 +1,66 @@
+{% extends "layout.html" %}
+{% block title %}Programação{% endblock %}
+
+{% block content %}
+<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.2rem;">
+    <h1>🎞️ Programação do Cinema</h1>
+    <a class="btn" href="{{ url_for('cinema.cadastrar_sessao') }}">+ Nova sessão</a>
+</div>
+
+{% if sessoes %}
+<table>
+    <thead>
+        <tr>
+            <th>Filme</th>
+            <th>Classificação</th>
+            <th>Sala</th>
+            <th>Data / Hora</th>
+            <th>Preço</th>
+            <th>Vagas</th>
+            <th>Ações</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for sessao in sessoes %}
+        <tr>
+            <td><strong>{{ sessao.filme.titulo }}</strong></td>
+            <td>
+                {% set cl = sessao.filme.classificacao %}
+                <span class="badge {% if cl == 'L' %}badge-verde{% elif cl in ['10','12'] %}badge-amarelo{% else %}badge-vermelho{% endif %}">
+                    {{ cl }}
+                </span>
+            </td>
+            <td>Sala {{ sessao.sala.numero }}</td>
+            <td>{{ sessao.data_hora.strftime('%d/%m/%Y %H:%M') }}</td>
+            <td>R$ {{ "%.2f"|format(sessao.preco) }}</td>
+            <td>
+                {% set vagas = sessao.vagas_disponiveis() %}
+                <span class="badge {% if vagas == 0 %}badge-vermelho{% elif vagas < 10 %}badge-amarelo{% else %}badge-verde{% endif %}">
+                    {% if vagas == 0 %}Lotado{% else %}{{ vagas }} vagas{% endif %}
+                </span>
+            </td>
+            <td class="acoes">
+                {% if vagas > 0 %}
+                <a class="btn" href="{{ url_for('cinema.comprar_ingresso', sessao_id=sessao.id) }}" style="font-size:0.8rem; padding:0.3rem 0.8rem;">
+                    🎟️ Comprar
+                </a>
+                {% endif %}
+                <form class="inline" method="POST" action="{{ url_for('cinema.excluir_sessao', sessao_id=sessao.id) }}"
+                      onsubmit="return confirm('Excluir esta sessão?')">
+                    <button class="btn btn-ghost" style="font-size:0.8rem; padding:0.3rem 0.8rem;">🗑️</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<div class="card" style="text-align:center; padding:3rem; color:#666;">
+    <p style="font-size:2rem;">🎬</p>
+    <p style="margin-top:0.5rem;">Nenhuma sessão cadastrada ainda.</p>
+    <a class="btn" href="{{ url_for('cinema.cadastrar_sessao') }}" style="margin-top:1rem; display:inline-block;">
+        Cadastrar primeira sessão
+    </a>
+</div>
+{% endif %}
+{% endblock %}
